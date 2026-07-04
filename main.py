@@ -15,4 +15,4 @@ report = {
 with open("report.json", "w", encoding="utf-8") as f:
     json.dump(report, f, indent=4)
 
-print("✔ report.json created")
+print(" report.json created")
