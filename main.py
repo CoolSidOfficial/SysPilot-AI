@@ -1,18 +1,17 @@
 import json
+import os
 
-from collectors import system
-from collectors import cpu
-from collectors import memory
+from process_explorer.explorer import enumerate_processes
 
+os.makedirs("output", exist_ok=True)
 
-report = {
-    "system": system.collect(),
-    "cpu": cpu.collect(),
-    "memory": memory.collect(),
-}
+processes = enumerate_processes()
 
+print(f"Found {len(processes)} processes")
 
-with open("report.json", "w", encoding="utf-8") as f:
-    json.dump(report, f, indent=4)
-
-print(" report.json created")
+with open("output/report.json", "w") as f:
+    json.dump(
+        [p.to_dict() for p in processes],
+        f,
+        indent=4,
+    )
