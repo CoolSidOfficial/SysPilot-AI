@@ -1,17 +1,18 @@
 # autoruns_collector.py
 """
 Autoruns Collector for SysPilot-Ai
-Runs Autorunsc.exe directly from command line
+Uses Sysinternals Autorunsc to collect startup entries
 """
 
 import subprocess
 import csv
 import os
+import re
 from pathlib import Path
 from datetime import datetime
 from typing import List, Optional
 from dataclasses import dataclass, asdict, field
-
+import json
 
 @dataclass
 class AutorunEntry:
@@ -39,6 +40,18 @@ class AutorunsCollector:
         self.autorunsc_path = autorunsc_path
         self.entries: List[AutorunEntry] = []
         
+        # Check if autorunsc exists
+        if not os.path.exists(self.autorunsc_path):
+            alt_paths = [
+                "autorunsc64.exe",
+                "tools/autorunsc.exe",
+                "autorunsc.exe",
+            ]
+            for alt in alt_paths:
+                if os.path.exists(alt):
+                    self.autorunsc_path = alt
+                    break
+        
     def collect(self) -> List[AutorunEntry]:
         """Run Autorunsc and collect startup entries"""
         
@@ -47,18 +60,17 @@ class AutorunsCollector:
                 f"autorunsc64.exe not found at: {self.autorunsc_path}\n"
                 "Please download from:\n"
                 "https://learn.microsoft.com/en-us/sysinternals/downloads/autoruns\n"
-                "And place it in the root directory."
+                "And place it in: SysPilot-Ai/tools/autorunsc64.exe"
             )
         
-        print(f"\n  Running: {self.autorunsc_path} -accepteula -a * -c -s *")
+        print(f"\n  Running: {os.path.basename(self.autorunsc_path)} -accepteula -a * -s *")
         
-        # Build command - exactly like you showed
+        # Use human-readable output (more reliable)
         cmd = [
             self.autorunsc_path,
             "-accepteula",
             "-a", "*",
-            "-c",
-            "-s",
+            "-s",  # Verify signatures
             "*"
         ]
         
@@ -67,19 +79,26 @@ class AutorunsCollector:
                 cmd,
                 capture_output=True,
                 text=True,
-                shell=True,
+                shell=False,
                 timeout=300
             )
             
-            if result.returncode != 0:
+            if result.returncode != 0 and result.returncode != 1:
                 print(f"  ⚠️ Autorunsc returned: {result.returncode}")
+            
+            if result.stderr:
+                # Filter out profile path errors (they're normal)
+                stderr_lines = result.stderr.splitlines()
+                filtered = [l for l in stderr_lines if "Error expanding" not in l and "NT AUTHORITY" not in l]
+                if filtered:
+                    print(f"  ⚠️ {filtered[0][:200]}")
             
             if not result.stdout.strip():
                 print("  ⚠️ No output from Autorunsc")
                 return []
             
-            # Parse the CSV output
-            self.entries = self._parse_csv(result.stdout)
+            # Parse the human-readable output
+            self.entries = self._parse_human_readable(result.stdout)
             
             # Analyze risks
             for entry in self.entries:
@@ -95,24 +114,65 @@ class AutorunsCollector:
             print(f"  ⚠️ Error running Autorunsc: {e}")
             return []
     
+    def _parse_human_readable(self, output: str) -> List[AutorunEntry]:
+        """Parse human-readable output from Autorunsc"""
+        entries = []
+        
+        try:
+            lines = output.strip().splitlines()
+            
+            # Skip header lines (Sysinternals copyright, etc.)
+            start_index = 0
+            for i, line in enumerate(lines):
+                if "HKLM" in line or "HKCU" in line or "Task Scheduler" in line or "C:" in line or "HKCR" in line:
+                    start_index = i
+                    break
+            
+            for line in lines[start_index:]:
+                line = line.strip()
+                if not line:
+                    continue
+                
+                # Parse lines like:
+                # HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Run  RtkAudUService  C:\WINDOWS\System32\...
+                # or
+                # Task Scheduler   \Microsoft\Windows\...
+                parts = line.split(maxsplit=2)
+                if len(parts) >= 2:
+                    location = parts[0]
+                    name = parts[1] if len(parts) > 1 else ""
+                    path = parts[2] if len(parts) > 2 else ""
+                    
+                    entry = AutorunEntry(
+                        entry=name,
+                        entry_location=location,
+                        image_path=path,
+                        enabled=True
+                    )
+                    entries.append(entry)
+                
+        except Exception as e:
+            print(f"  ⚠️ Error parsing: {e}")
+            # Try CSV parsing as fallback
+            return self._parse_csv(output)
+        
+        return entries
+    
     def _parse_csv(self, csv_data: str) -> List[AutorunEntry]:
-        """Parse CSV output from Autorunsc"""
+        """Fallback: Parse CSV output from Autorunsc"""
         entries = []
         
         try:
             lines = csv_data.strip().splitlines()
-            if not lines:
-                return []
             
             # Find the header line
             header_index = -1
             for i, line in enumerate(lines):
-                if "Time," in line and "Entry Location" in line and "Entry," in line:
+                if "Entry" in line and "Entry Location" in line and "Image Path" in line:
                     header_index = i
                     break
             
             if header_index == -1:
-                print("  ⚠️ Could not find CSV header")
                 return []
             
             reader = csv.DictReader(lines[header_index:])
@@ -120,7 +180,6 @@ class AutorunsCollector:
                 entry_name = row.get("Entry", "").strip()
                 image_path = row.get("Image Path", "").strip()
                 
-                # Skip empty entries
                 if not entry_name and not image_path:
                     continue
                 
@@ -136,7 +195,6 @@ class AutorunsCollector:
                     enabled=row.get("Enabled", "enabled").lower() in ["enabled", "true", "yes"],
                     category=row.get("Category", "Unknown").strip(),
                 )
-                
                 entries.append(entry)
                 
         except Exception as e:
@@ -156,7 +214,7 @@ class AutorunsCollector:
             risks.append("unsigned")
         
         # Check for missing file
-        if "file not found" in entry.image_path.lower():
+        if entry.image_path and "file not found" in entry.image_path.lower():
             risks.append("missing_file")
         
         # Check for OEM
@@ -284,5 +342,8 @@ if __name__ == "__main__":
     collector = AutorunsCollector()
     entries = collector.collect()
     
-    report = generate_autorun_report(entries)
-    print(report)
+    if entries:
+        report = generate_autorun_report(entries)
+        print(report)
+    else:
+        print("\n❌ No autorun entries found!")

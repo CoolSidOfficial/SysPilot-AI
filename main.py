@@ -9,16 +9,18 @@ import os
 import time
 from pathlib import Path
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'process_explorer'))
+# Add current directory to path for imports
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-import ctypes
-from process import Process
-from winapi import *
-from explorer import generate_text_report_file, generate_json_report
+# Process Explorer imports
+from process_explorer.process import Process
+from process_explorer.winapi import *
+from process_explorer.explorer import generate_text_report_file, generate_json_report
 
 # Import collectors
 from autoruns_collector import AutorunsCollector, generate_autorun_report, save_autorun_json
 from network_collector import NetworkCollector, generate_network_report, save_network_json
+from memory_collector import MemoryCollector, save_memory_json
 
 
 def collect_processes() -> list[Process]:
@@ -204,7 +206,7 @@ def main():
         # ============================================================
         # STEP 3: Generate process reports
         # ============================================================
-        print("\n[3/6] Generating process reports...")
+        print("\n[3/7] Generating process reports...")
         
         txt_file = generate_text_report_file(processes)
         json_file = generate_json_report(processes)
@@ -213,7 +215,7 @@ def main():
         # ============================================================
         # STEP 4: Collect autoruns
         # ============================================================
-        print("\n[4/6] Collecting autoruns...")
+        print("\n[4/7] Collecting autoruns...")
         
         autorun_entries = []
         try:
@@ -241,7 +243,7 @@ def main():
         # ============================================================
         # STEP 5: Collect network connections
         # ============================================================
-        print("\n[5/6] Collecting network connections...")
+        print("\n[5/7] Collecting network connections...")
         
         network_entries = []
         try:
@@ -267,7 +269,29 @@ def main():
             print("  Skipping network collection...")
         
         # ============================================================
-        # STEP 6: Print statistics and summary
+        # STEP 6: Collect memory information
+        # ============================================================
+        print("\n[6/7] Collecting memory information...")
+        
+        memory_data = {}
+        try:
+            mem_collector = MemoryCollector()
+            memory_data = mem_collector.collect()
+            
+            if memory_data:
+                # Memory report is already saved by the collector
+                # Save JSON
+                memory_json = save_memory_json(memory_data)
+                print(f"  ✅ Memory: {len(memory_data.get('processes', []))} processes analyzed")
+            else:
+                print(f"  ⚠️ No memory data collected")
+            
+        except Exception as e:
+            print(f"  ⚠️ Error collecting memory: {e}")
+            print("  Skipping memory collection...")
+        
+        # ============================================================
+        # STEP 7: Print statistics and summary
         # ============================================================
         print_statistics(processes)
         
@@ -285,12 +309,15 @@ def main():
             print(f"     📄 Network Text:   {network_txt.name}")
         if 'network_json' in locals() and network_entries:
             print(f"     📊 Network JSON:   {network_json.name}")
+        if 'memory_json' in locals() and memory_data:
+            print(f"     📊 Memory JSON:    {memory_json.name}")
         
         # Summary
         print(f"\n  📊 Collection Summary:")
         print(f"     Processes:  {len(processes)}")
         print(f"     Autoruns:   {len(autorun_entries) if autorun_entries else 0}")
         print(f"     Network:    {len(network_entries) if network_entries else 0}")
+        print(f"     Memory:     {len(memory_data.get('processes', [])) if memory_data else 0} processes analyzed")
         
         print(f"\n  ⏱️  Completed in {elapsed:.1f} seconds")
         

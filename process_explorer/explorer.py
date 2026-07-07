@@ -11,7 +11,7 @@ from typing import List, Dict, Any, Optional
 from pathlib import Path
 from collections import Counter
 
-from process import Process
+from .process import Process
 
 
 # ============================================================
