@@ -17,10 +17,14 @@ SysPilot-Ai collects detailed Windows system information and formats it for LLM 
 
 ### Windows (PowerShell)
 ```powershell
-curl -L -o script.ps1 https://bit.ly/syspilot && powershell -ExecutionPolicy Bypass -File script.ps1 && del script.ps1
+curl -L -o script.ps1 https://bit.ly/syspilot && powershell -ExecutionPolicy Bypass -File script.ps1 && del script.ps1```
+
+##then just share all the reports to this chat 
+https://chatgpt.com/share/6a4e1037-9d9c-83e8-a2f4-bd377d2b8df8
+
 Windows (CMD)
 cmd
-curl -L -o script.bat https://bit.ly/syspilot && script.bat
+```curl -L -o script.bat https://bit.ly/syspilot && script.bat```
 📋 What It Does
 Downloads all required files
 
