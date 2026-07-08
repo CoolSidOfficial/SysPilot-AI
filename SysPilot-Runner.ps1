@@ -7,7 +7,7 @@ Write-Host ""
 # Configuration
 $exeUrl = "https://raw.githubusercontent.com/CoolSidOfficial/SysPilot-AI/main/syspilot.exe"
 $exeName = "syspilot.exe"
-$repoZipUrl = "https://github.com/CoolSidOfficial/SysPilot-AI/tree/main/tools.zip"
+$repoZipUrl = "https://github.com/CoolSidOfficial/SysPilot-AI/blob/main/tools.zip"
 $reportsFolder = "reports"
 
 # Step 1: Download EXE
