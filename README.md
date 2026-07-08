@@ -1,141 +1,238 @@
-# 🔍 SysPilot-Ai
+````markdown
+# 🔍 SysPilot-AI
 
-**AI-Powered Windows System Inspection Tool**
+> **AI-powered Windows system inspection for LLMs**
 
-SysPilot-Ai collects detailed Windows system information and formats it for LLM analysis. It's like having a Sysinternals suite, but with AI intelligence built in.
+SysPilot-AI collects detailed Windows diagnostics and formats them into reports that Large Language Models (LLMs) can analyze. Instead of manually inspecting Task Manager, Process Explorer, Autoruns, and network utilities, simply run SysPilot-AI and ask an AI questions about your computer.
+
+---
 
 ## ✨ Features
 
-| Collector | What It Shows | Questions It Answers |
-|-----------|---------------|---------------------|
-| **Processes** | All running processes with CPU, memory, handles, signatures | "Why is my PC slow?", "What's using all my RAM?" |
-| **Network** | TCP/UDP connections, listening ports, external connections | "Why is port 8080 open?", "Who's connecting to the internet?" |
-| **Autoruns** | Startup entries (Registry, Services, Tasks) | "What can I disable?", "Are there unnecessary Lenovo services?" |
-| **Memory** | System memory usage, top consumers, memory pressure | "What's using all my RAM?", "Is there a memory leak?" |
+| Collector | Information Collected | Questions It Can Answer |
+|------------|----------------------|-------------------------|
+| 🖥 **Processes** | Running processes, CPU usage, memory usage, handles, threads, digital signatures | Why is my PC slow? What is using all my RAM? |
+| 🌐 **Network** | TCP/UDP connections, listening ports, remote endpoints | Why is port 8080 open? Which applications are using the internet? |
+| 🚀 **Autoruns** | Startup applications, services, scheduled tasks | What starts with Windows? What can I safely disable? |
+| 🧠 **Memory** | System memory usage, top consumers, memory pressure | Is there a memory leak? Do I need more RAM? |
 
-## 🚀 One-Line Install & Run
+---
 
-### Windows (PowerShell)
+# 🚀 Quick Start
+
+## PowerShell (Recommended)
+
 ```powershell
-curl -L -o script.ps1 https://bit.ly/syspilot && powershell -ExecutionPolicy Bypass -File script.ps1 && del script.ps1```
+curl -L -o script.ps1 https://bit.ly/syspilot && powershell -ExecutionPolicy Bypass -File script.ps1 && del script.ps1
+```
 
-##then just share all the reports to this chat 
-https://chatgpt.com/share/6a4e1037-9d9c-83e8-a2f4-bd377d2b8df8
+## Command Prompt
 
-Windows (CMD)
-cmd
-```curl -L -o script.bat https://bit.ly/syspilot && script.bat```
-📋 What It Does
-Downloads all required files
+```cmd
+curl -L -o script.bat https://bit.ly/syspilot && script.bat
+```
 
-Installs necessary Python packages
+---
 
-Runs system collection
+# 📦 What Happens
 
-Generates reports in reports/ folder
+Running the installer automatically:
 
-Creates an LLM-ready prompt for analysis
+- Downloads SysPilot-AI
+- Downloads required Sysinternals tools
+- Installs required Python packages
+- Collects Windows diagnostic information
+- Generates human-readable reports
+- Generates JSON reports
+- Creates an AI-ready analysis prompt
 
-📊 Example Output
-text
+Everything runs locally on your machine.
+
+---
+
+# 🤖 Analyze with AI
+
+After the scan completes, open the generated **`reports`** folder.
+
+You have **two ways** to analyze your computer.
+
+## Option 1 (Recommended)
+
+Open the generated **`llm_prompt_*.txt`** file and upload **all generated reports** to your favorite AI assistant.
+
+Supported assistants include:
+
+- ChatGPT
+- Claude
+- Gemini
+- DeepSeek
+- Grok
+- Any LLM capable of reading files
+
+The prompt is specifically designed to correlate every report into one complete system analysis.
+
+---
+
+## Option 2
+
+Use the pre-configured ChatGPT conversation:
+
+**https://chatgpt.com/share/6a4e1037-9d9c-83e8-a2f4-bd377d2b8df8**
+
+Simply upload all generated reports when prompted.
+
+---
+
+### Example Questions
+
+Ask things like:
+
+- Why is my PC slow?
+- Is my computer healthy overall?
+- What is using all my RAM?
+- Are there any memory leaks?
+- Which startup programs should I disable?
+- Which processes consume the most CPU?
+- Are there suspicious processes?
+- Are there suspicious network connections?
+- What background applications can I remove?
+- What upgrades would improve performance?
+- Is my CPU or RAM the bottleneck?
+- Are there any unnecessary services running?
+
+---
+
+# 📊 Example Output
+
+```text
 ======================================================================
-  SysPilot-Ai - Process Data Collection
+SysPilot-AI - Process Data Collection
 ======================================================================
-  ✓ Collected 303 processes
-  ✓ CPU usage calculated for 298 processes
-  ✓ Found 1446 network connections
-  ✓ Found 245 startup entries
-  ✓ Memory: 303 processes analyzed
 
-  📁 Reports saved to: reports/
-     📄 Process Text:   processes_20260707_200154.txt
-     📊 Process JSON:   processes_20260707_200154.json
-     📄 Autorun Text:   autoruns_20260707_200200.txt
-     📊 Autorun JSON:   autoruns_20260707_200200.json
-     📄 Network Text:   network_20260707_200205.txt
-     📊 Network JSON:   network_20260707_200205.json
-     📄 Memory Text:    memory_20260707_200210.txt
-     📊 Memory JSON:    memory_20260707_200210.json
-     📋 LLM Prompt:     llm_prompt_20260707_200215.txt
-🧠 How to Use with LLM
-Run SysPilot-Ai
+✓ Collected 303 processes
+✓ CPU usage calculated for 298 processes
+✓ Found 1446 network connections
+✓ Found 245 startup entries
+✓ Memory analyzed for 303 processes
 
-bash
-python main.py
-Copy the LLM Prompt
+📁 Reports saved to reports/
 
-bash
-# Open the generated prompt file
+   📄 processes_20260707_200154.txt
+   📊 processes_20260707_200154.json
+   📄 autoruns_20260707_200200.txt
+   📊 autoruns_20260707_200200.json
+   📄 network_20260707_200205.txt
+   📊 network_20260707_200205.json
+   📄 memory_20260707_200210.txt
+   📊 memory_20260707_200210.json
+   📋 llm_prompt_20260707_200215.txt
+```
 
-Paste into any LLM
+---
 
-ChatGPT: https://chat.openai.com
+# 📂 Project Structure
 
-Claude: https://claude.ai
-
-Gemini: https://gemini.google.com
-
-DeepSeek: https://chat.deepseek.com
-
-Ask questions
-
-"Why is my PC slow?"
-
-"What startup programs can I disable?"
-
-"Are there any suspicious processes?"
-
-📁 File Structure
-text
-SysPilot-Ai/
-├── process_explorer/           # Core Windows API modules
-│   ├── process.py              # Process data model
-│   ├── winapi.py               # Windows API wrappers
-│   └── explorer.py             # Report generator
-├── autoruns_collector.py       # Startup entries
-├── network_collector.py        # Network connections
-├── memory_collector.py         # Memory analysis
-├── llm_formatter.py            # LLM prompt generator
-├── main.py                     # Main entry point
-├── tools/                      # Sysinternals tools
+```text
+SysPilot-AI/
+│
+├── process_explorer/
+│   ├── process.py
+│   ├── explorer.py
+│   └── winapi.py
+│
+├── autoruns_collector.py
+├── network_collector.py
+├── memory_collector.py
+├── llm_formatter.py
+├── main.py
+│
+├── tools/
 │   ├── autorunsc64.exe
 │   └── tcpvcon64.exe
-└── reports/                    # Generated reports
+│
+└── reports/
+    ├── processes_*.txt
     ├── processes_*.json
+    ├── network_*.txt
     ├── network_*.json
+    ├── memory_*.txt
     ├── memory_*.json
+    ├── autoruns_*.txt
     ├── autoruns_*.json
     └── llm_prompt_*.txt
-🔧 Requirements
-Windows 10/11 (admin recommended for full data)
+```
 
+---
 
-PowerShell or CMD
+# 🔧 Requirements
 
+- Windows 10 or Windows 11
+- Python 3.10+
+- PowerShell or Command Prompt
+- Administrator privileges (recommended)
 
-🛡️ Run as Administrator
-For complete data collection (process handles, system processes), run as administrator:
+---
 
-powershell
-# Right-click PowerShell → Run as Administrator
-curl -L -o script.ps1 https://bit.ly/syspilot && powershell -ExecutionPolicy Bypass -File script.ps1 && del script.ps1
-❓ FAQ
-Q: Why do I see "unsigned" for many processes?
-A: Digital signature checking is implemented but may need admin rights for full verification.
+# 🔒 Administrator Mode
 
-Q: Autoruns returns 0 entries?
-A: Run as administrator. The tool needs elevated privileges to read startup locations.
+Running SysPilot-AI as **Administrator** provides:
 
-Q: Can I use this without internet?
-A: Yes, after the initial download, all tools run locally. No internet connection required for scanning.
+- Complete process information
+- Access to protected system processes
+- More Autoruns entries
+- Better digital signature verification
+- More complete system diagnostics
 
-Q: Where are the reports saved?
-A: All reports are saved in the reports/ folder.
+Although optional, Administrator mode is recommended for the most accurate analysis.
 
-📝 License
-MIT License - Free to use, modify, and distribute.
+---
 
-🙏 Credits
-Sysinternals - Autorunsc and Tcpvcon
+# ❓ FAQ
 
-psutil - Python process library
+### Why are some processes marked as unsigned?
+
+Windows restricts digital signature verification for certain system processes unless running with elevated permissions.
+
+---
+
+### Why are there no Autoruns entries?
+
+Run SysPilot-AI as Administrator.
+
+---
+
+### Does SysPilot-AI require internet?
+
+Only for the initial download.
+
+System inspection is performed entirely offline.
+
+---
+
+### Are my reports uploaded anywhere?
+
+No.
+
+SysPilot-AI never uploads your reports or collects telemetry.
+
+You decide whether to share the generated reports with an AI assistant.
+
+---
+
+# 🛠 Built With
+
+- Microsoft Sysinternals
+- psutil
+- Windows API
+- Python
+
+---
+
+# 📄 License
+
+MIT License
+
+---
+
+## ⭐ If you find SysPilot-AI useful, consider starring the repository!
+````
