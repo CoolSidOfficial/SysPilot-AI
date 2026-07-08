@@ -1,250 +1,137 @@
-# SysAudit AI
+# 🔍 SysPilot-Ai
+
+**AI-Powered Windows System Inspection Tool**
+
+SysPilot-Ai collects detailed Windows system information and formats it for LLM analysis. It's like having a Sysinternals suite, but with AI intelligence built in.
+
+## ✨ Features
+
+| Collector | What It Shows | Questions It Answers |
+|-----------|---------------|---------------------|
+| **Processes** | All running processes with CPU, memory, handles, signatures | "Why is my PC slow?", "What's using all my RAM?" |
+| **Network** | TCP/UDP connections, listening ports, external connections | "Why is port 8080 open?", "Who's connecting to the internet?" |
+| **Autoruns** | Startup entries (Registry, Services, Tasks) | "What can I disable?", "Are there unnecessary Lenovo services?" |
+| **Memory** | System memory usage, top consumers, memory pressure | "What's using all my RAM?", "Is there a memory leak?" |
 
-> **An AI-powered Windows system auditor that explains your computer like an expert engineer.**
+## 🚀 One-Line Install & Run
 
-SysAudit AI collects a comprehensive snapshot of a Windows system and allows an AI assistant to analyze, explain, and answer questions about the machine in plain English.
+### Windows (PowerShell)
+```powershell
+curl -L -o script.ps1 https://bit.ly/syspilot && powershell -ExecutionPolicy Bypass -File script.ps1 && del script.ps1
+Windows (CMD)
+cmd
+curl -L -o script.bat https://bit.ly/syspilot && script.bat
+📋 What It Does
+Downloads all required files
+
+Installs necessary Python packages
 
-Instead of showing thousands of processes, registry entries, services, and network connections, SysAudit AI helps users understand **why** their system behaves the way it does.
+Runs system collection
+
+Generates reports in reports/ folder
 
----
+Creates an LLM-ready prompt for analysis
 
-# Vision
+📊 Example Output
+text
+======================================================================
+  SysPilot-Ai - Process Data Collection
+======================================================================
+  ✓ Collected 303 processes
+  ✓ CPU usage calculated for 298 processes
+  ✓ Found 1446 network connections
+  ✓ Found 245 startup entries
+  ✓ Memory: 303 processes analyzed
 
-Modern diagnostic tools expose raw data.
+  📁 Reports saved to: reports/
+     📄 Process Text:   processes_20260707_200154.txt
+     📊 Process JSON:   processes_20260707_200154.json
+     📄 Autorun Text:   autoruns_20260707_200200.txt
+     📊 Autorun JSON:   autoruns_20260707_200200.json
+     📄 Network Text:   network_20260707_200205.txt
+     📊 Network JSON:   network_20260707_200205.json
+     📄 Memory Text:    memory_20260707_200210.txt
+     📊 Memory JSON:    memory_20260707_200210.json
+     📋 LLM Prompt:     llm_prompt_20260707_200215.txt
+🧠 How to Use with LLM
+Run SysPilot-Ai
 
-SysAudit AI turns that data into actionable knowledge.
+bash
+python main.py
+Copy the LLM Prompt
 
-Examples:
+bash
+# Open the generated prompt file
 
-* Why is my PC slow?
-* What is using all my RAM?
-* Is this process safe?
-* What starts when Windows boots?
-* Why is this port open?
-* Is anything suspicious?
-* What changed since last week?
-* Can I safely disable this service?
+Paste into any LLM
 
-The goal is to provide an experience similar to chatting with an experienced Windows systems engineer.
+ChatGPT: https://chat.openai.com
 
----
+Claude: https://claude.ai
 
-# Features
+Gemini: https://gemini.google.com
 
-## System Snapshot
+DeepSeek: https://chat.deepseek.com
 
-Collect a comprehensive snapshot of the current system, including:
+Ask questions
 
-* Operating System
-* Hardware Information
-* CPU
-* Memory
-* Storage
-* Running Processes
-* Windows Services
-* Startup Programs
-* Network Connections
-* Installed Software
-* Drivers
-* Scheduled Tasks
-* Windows Security
-* Event Logs
-* Browser Extensions (planned)
-* Docker & WSL (planned)
+"Why is my PC slow?"
 
----
+"What startup programs can I disable?"
 
-## AI Analysis
+"Are there any suspicious processes?"
 
-Generate intelligent explanations such as:
+📁 File Structure
+text
+SysPilot-Ai/
+├── process_explorer/           # Core Windows API modules
+│   ├── process.py              # Process data model
+│   ├── winapi.py               # Windows API wrappers
+│   └── explorer.py             # Report generator
+├── autoruns_collector.py       # Startup entries
+├── network_collector.py        # Network connections
+├── memory_collector.py         # Memory analysis
+├── llm_formatter.py            # LLM prompt generator
+├── main.py                     # Main entry point
+├── tools/                      # Sysinternals tools
+│   ├── autorunsc64.exe
+│   └── tcpvcon64.exe
+└── reports/                    # Generated reports
+    ├── processes_*.json
+    ├── network_*.json
+    ├── memory_*.json
+    ├── autoruns_*.json
+    └── llm_prompt_*.txt
+🔧 Requirements
+Windows 10/11 (admin recommended for full data)
 
-* Performance bottlenecks
-* Startup impact
-* Memory usage
-* CPU hotspots
-* Network activity
-* Suspicious processes
-* Service recommendations
-* Security observations
-* System health overview
 
----
+PowerShell or CMD
 
-## Interactive Chat
 
-Ask questions naturally.
+🛡️ Run as Administrator
+For complete data collection (process handles, system processes), run as administrator:
 
-Example:
+powershell
+# Right-click PowerShell → Run as Administrator
+curl -L -o script.ps1 https://bit.ly/syspilot && powershell -ExecutionPolicy Bypass -File script.ps1 && del script.ps1
+❓ FAQ
+Q: Why do I see "unsigned" for many processes?
+A: Digital signature checking is implemented but may need admin rights for full verification.
 
-```
-Why is my PC slow?
+Q: Autoruns returns 0 entries?
+A: Run as administrator. The tool needs elevated privileges to read startup locations.
 
-What is using all my RAM?
+Q: Can I use this without internet?
+A: Yes, after the initial download, all tools run locally. No internet connection required for scanning.
 
-Can I disable Lenovo Service Bridge?
+Q: Where are the reports saved?
+A: All reports are saved in the reports/ folder.
 
-Is this process malware?
+📝 License
+MIT License - Free to use, modify, and distribute.
 
-Why is port 8080 open?
+🙏 Credits
+Sysinternals - Autorunsc and Tcpvcon
 
-Why do I have so many svchost.exe processes?
-```
-
----
-
-# Project Goals
-
-* Zero installation experience
-* One-command execution
-* Complete system snapshot
-* Human-readable explanations
-* AI-first architecture
-* Modular collectors
-* Privacy-first design
-
----
-
-# Architecture
-
-```
-Windows System
-        │
-        ▼
-System Collectors
-        │
-        ▼
-Structured JSON Report
-        │
-        ▼
-AI Analysis Engine
-        │
-        ▼
-Interactive Chat Interface
-```
-
----
-
-# Planned Collector Modules
-
-```
-collectors/
-
-system.py
-hardware.py
-cpu.py
-memory.py
-storage.py
-processes.py
-services.py
-startup.py
-network.py
-drivers.py
-tasks.py
-software.py
-security.py
-eventlogs.py
-browser.py
-docker.py
-wsl.py
-```
-
-Each collector is responsible for gathering one specific category of information and returning structured data.
-
----
-
-# Project Structure
-
-```
-SysAudit-AI/
-
-collectors/
-backend/
-frontend/
-schemas/
-docs/
-tests/
-
-README.md
-requirements.txt
-```
-
----
-
-# Roadmap
-
-## Phase 1
-
-* [ ] System information
-* [ ] CPU
-* [ ] Memory
-* [ ] Disk
-* [ ] Processes
-* [ ] Services
-* [ ] Startup programs
-* [ ] Network connections
-* [ ] JSON report generation
-
-## Phase 2
-
-* [ ] Installed applications
-* [ ] Drivers
-* [ ] Scheduled tasks
-* [ ] Windows Defender
-* [ ] Firewall
-* [ ] Event logs
-* [ ] Hardware details
-
-## Phase 3
-
-* [ ] AI backend
-* [ ] Interactive chat
-* [ ] Automatic report upload
-* [ ] Browser interface
-
-## Phase 4
-
-* [ ] Historical snapshots
-* [ ] Change detection
-* [ ] AI recommendations
-* [ ] One-click safe fixes
-
----
-
-# Tech Stack
-
-## Collector
-
-* Python
-
-## AI
-
-* OpenAI Responses API (initial)
-* Additional LLM providers planned
-
-## Frontend
-
-* HTML
-* JavaScript
-
-## Backend
-
-* FastAPI
-
----
-
-# Guiding Principles
-
-* Never guess when system data can be collected.
-* Prefer native Windows APIs over fragile parsing.
-* Explain technical concepts in plain language.
-* Keep collectors modular and independently testable.
-* Separate data collection from AI reasoning.
-* Prioritize transparency and user privacy.
-
----
-
-# Current Status
-
-🚧 Early development
-
-The current focus is building reliable system collectors and defining a stable report schema that will power future AI analysis.
+psutil - Python process library
