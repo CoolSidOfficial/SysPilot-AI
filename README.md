@@ -1,4 +1,4 @@
-````markdown
+
 # 🔍 SysPilot-AI
 
 > **AI-powered Windows system inspection for LLMs**
@@ -234,5 +234,4 @@ MIT License
 
 ---
 
-## ⭐ If you find SysPilot-AI useful, consider starring the repository!
-````
+## ⭐ Currently working on adding LLM and RAG!
